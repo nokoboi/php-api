@@ -102,7 +102,7 @@ function updateUser($usuario, $id)
         $affected = $usuario->updateUser($id, $data['nombre'], $data['email']);
         echo json_encode(['affected' => $affected]);
     } else {
-        echo json_encode(['Error' => 'datos inexistentes']);
+        echo json_encode(['Error' => 'datos incorrectos']);
     }
 }
 
