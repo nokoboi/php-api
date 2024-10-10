@@ -38,5 +38,33 @@ class Validator
         return $errors;
     }
 
+    public static function ValidateMovie($datos)
+    {
+        $errors = [];
+
+        // Validar el titulo de la pelicula
+        if (!isset($datos["titulo"]) || empty(trim($datos["titulo"]))) {
+            $errors["titulo"] = "El titulo es necesario";
+        } elseif (strlen($datos["titulo"]) < 2 || strlen(trim($datos["titulo"])) > 30) {
+            $errors["titulo"] = "El titulo es demasiado largo";
+        }
+
+        // Validar el precio de la pelicula
+        if (!isset($datos["precio"]) || empty($datos["precio"])) {
+            $errors["precio"] = "El precio es necesario";
+        } elseif ($datos["precio"] < 0) {
+            $errors["precio"] = "El precio no puede ser negativo";
+        }
+
+        // Validar el director
+        if(!isset($datos["id_director"]) || empty($datos["id_director"])){
+            $errors["id_director"] = "El director es necesario";
+        }elseif($datos["id_director"] < 0){
+            $errors["id_director"] = "El id de director no puede ser negativo";
+        }
+
+        return $errors;
+    }
+
 
 }

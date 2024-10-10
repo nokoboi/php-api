@@ -19,7 +19,8 @@ class Usuario
 
     public function getById($id)
     {
-        $result = $this->db->query("SELECT * from usuario where id=?", [$id]);
+        $idSaneado = Validator::Sanitize([$id]);
+        $result = $this->db->query("SELECT * from usuario where id=?", [$idSaneado[0]]);
         return $result->fetch_assoc();
     }
 
@@ -38,6 +39,12 @@ class Usuario
 
         $nombreSaneado = $sanitizedData['nombre'];
         $emailSaneado = $sanitizedData['email'];
+
+        $result = $this->db->query('SELECT id from usuario where email=?', [$emailSaneado]);
+        if($result->num_rows > 0) { 
+            return "El usuario ya existe";
+        }
+
         // Hacemos la consulta a la base 
         $this->db->query("INSERT INTO usuario (nombre,email) VALUES(?,?)", [$nombreSaneado, $emailSaneado]);
 
@@ -46,7 +53,7 @@ class Usuario
 
     public function updateUser($id, $nombre, $email){
         // Recogemos los datos y los limpiamos
-        $data = ['nombre' => $nombre, 'email' => $email];
+        $data = ['id' => $id, 'nombre' => $nombre, 'email' => $email];
         $sanitizedData = Validator::Sanitize($data);
         $errors = Validator::Validate($sanitizedData);
 
@@ -58,8 +65,14 @@ class Usuario
 
         $nombreSaneado = $sanitizedData['nombre'];
         $emailSaneado = $sanitizedData['email'];
+        $idSaneado = $sanitizedData['id'];
 
-        $this->db->query("UPDATE usuario SET nombre = ?, email = ? where id=? ", [$nombreSaneado, $emailSaneado, $id]);
+        $result = $this->db->query('SELECT id from usuario where email = ? and id != ?',[$emailSaneado, $idSaneado]);
+        if($result->num_rows > 0) {
+            return "El email ya está en uso por otro usuario";
+        }
+
+        $this->db->query("UPDATE usuario SET nombre = ?, email = ? where id=? ", [$nombreSaneado, $emailSaneado, $idSaneado]);
         return $this->db->query("SELECT ROW_COUNT() as affected")->fetch_assoc()['affected'];
     }
 

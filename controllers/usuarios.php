@@ -86,10 +86,16 @@ function getAllUsuarios($usuario)
 
 function setUser($usuario)
 {
-    // Lee los datos del cuerpo de la solicitud y los pasa a formato json
     $data = json_decode(file_get_contents('php://input'), true);
-    $id = $usuario->createUser($data['nombre'], $data['email']);
-    echo json_encode(['id' => $id]);
+
+    // Comprobamos si el campo 'nombre' y 'email' del json existen, si no, no hacemos nada
+    if (isset($data['nombre']) && isset($data['email'])) {
+        $id = $usuario->createUser($data['nombre'], $data['email']);
+        echo json_encode(['id' => $id]);
+    } else {
+        echo json_encode(['Error' => 'Faltan datos']);
+    }
+
 }
 
 function updateUser($usuario, $id)
@@ -98,7 +104,7 @@ function updateUser($usuario, $id)
     $data = json_decode(file_get_contents('php://input'), true);
 
     // Comprobamos si el campo 'nombre' y 'email' del json existen, si no, no hacemos nada
-    if (!isset($data['nombre']) && !isset($data['email'])) {
+    if (isset($data['nombre']) && isset($data['email'])) {
         $affected = $usuario->updateUser($id, $data['nombre'], $data['email']);
         echo json_encode(['affected' => $affected]);
     } else {
