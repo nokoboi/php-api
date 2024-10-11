@@ -1,9 +1,9 @@
 <?php
-require_once '../data/Pelicula.php';
+require_once '../data/Director.php';
 require_once './utilidades.php';
 
 header('Content-Type: application/json');
-$pelicula = new Pelicula();
+$director = new Director();
 
 $method = $_SERVER['REQUEST_METHOD'];
 $uri = $_SERVER['REQUEST_URI'];
@@ -14,18 +14,18 @@ $id = Utilidades::getParameterValue($parametros, 'id');
 switch ($method) {
     case 'GET':
         if ($id) {
-            $respuesta = getMovieByID($pelicula, $id);
+            $respuesta = getMovieByID($director, $id);
         } else {
-            $respuesta = getAllMovies($pelicula);
+            $respuesta = getAllMovies($director);
         }
         echo json_encode($respuesta);
         break;
     case 'POST':
-        setMovie($pelicula);
+        setMovie($director);
         break;
     case 'PUT':
         if ($id) {
-            updateMovie($pelicula, $id);
+            updateDirector($director, $id);
         } else {
             http_response_code(400);
             echo json_encode(['error'=> 'Id no proporcionado']);
@@ -33,7 +33,7 @@ switch ($method) {
         break;
     case 'DELETE':
         if ($id) {
-            deleteMovie($pelicula, $id);
+            deleteDirector($director, $id);
         } else {
             http_response_code(400);
             echo json_encode(['error'=> 'Id no proporcionado']);
@@ -41,22 +41,12 @@ switch ($method) {
         break;
 }
 
-function getAllMovies($pelicula)
-{
-    return $pelicula->getMovies($pelicula);
-}
-
-function getMovieByID($pelicula, $id)
-{
-    return $pelicula->getMovieID($id);
-}
-
-function setMovie($pelicula)
+function setDirector($director)
 {
     $data = json_decode(file_get_contents('php://input'), true);
 
-    if (isset($data["titulo"]) && isset($data["precio"]) && isset($data["id_director"])) {
-        $id = $pelicula->createMovie($data["titulo"], $data["precio"], $data["id_director"]);
+    if (isset($data["nombre"]) && isset($data["apellido"]) && isset($data["biografia"])) {
+        $id = $director->createDirector($data["nombre"], $data["apellido"], $data["biografia"]);
         echo json_encode($id);
     }else{
         echo json_encode(["error"=> "faltan datos"]);
@@ -64,11 +54,11 @@ function setMovie($pelicula)
 
 }
 
-function updateMovie($pelicula,$id){
+function updateDirector($director,$id){
     $data = json_decode(file_get_contents('php://input'), true);
 
-    if (isset($data["titulo"]) && isset($data["precio"]) && isset($data["id_director"])) {
-        $affected = $pelicula->updateMovie($id, $data["titulo"], $data["precio"], $data["id_director"]);
+    if (isset($data["nombre"]) && isset($data["apellido"]) && isset($data["biografia"])) {
+        $affected = $director->updateDirector($id, $data["nombre"], $data["apellido"], $data["biografia"]);
         echo json_encode(["affected"=>$affected]);
     }else{
         echo json_encode(["error"=> "datos incorrectos"]);
@@ -76,7 +66,7 @@ function updateMovie($pelicula,$id){
 
 }
 
-function deleteMovie($pelicula,$id){
-    $affected = $pelicula->deleteMovie($id);
+function deleteDirector($director,$id){
+    $affected = $director->deleteDirector($id);
     echo json_encode(["affected"=>$affected]);
 }
